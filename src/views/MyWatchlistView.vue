@@ -60,9 +60,12 @@ export default {
 body {
   font-family: Arial, sans-serif;
   background-color: #f1f1f1;
-  color: #f5af0d;
   margin: 0;
   padding: 0;
+}
+
+.h2 {
+  color: #f5af0d;
 }
 .page-container {
   padding: 20px;

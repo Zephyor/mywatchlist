@@ -23,9 +23,15 @@
           {{ rating >= star ? '★' : '☆' }}
         </span>
       </div>
-      <button @click.stop="toggleWatchlist" class="watchlist-btn">
+      <div class="buttons">
+        <button @click.stop="toggleWatchlist" class="watchlist-btn">
         {{ watchlistButtonText }}
-      </button>
+        </button>
+        <button @click.stop="toggleSeen" class="seen-btn">
+          {{ seenButton }}
+        </button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -50,6 +56,7 @@ export default defineComponent({
     const router = useRouter();
     const watchlistStore = useWatchlistStore();
     const rating = ref(0);
+    const isSeen = ref(false);
     const animeId = props.anime.mal_id;
 
     const isInWatchlist = ref(false);
@@ -63,6 +70,21 @@ export default defineComponent({
         `isInWatchlist_${animeId}`,
         JSON.stringify(newValue)
       );
+    });
+
+    if (localStorage.getItem(`isSeen_${animeId}`)) {
+      isSeen.value = JSON.parse(localStorage.getItem(`isSeen_${animeId}`));
+    }
+    watch(isSeen, (newValue) => {
+      localStorage.setItem(`isSeen_${animeId}`, JSON.stringify(newValue));
+    });
+
+    function toggleSeen() {
+      isSeen.value = !isSeen.value;
+    }
+
+    const seenButton = computed(() => {
+      return isSeen.value ? 'Mark as Unseen' : 'Mark as Seen';
     });
 
     function toggleWatchlist() {
@@ -101,6 +123,9 @@ export default defineComponent({
       setRating,
       rating,
       navigateToAnimePage,
+      isSeen,
+      toggleSeen,
+      seenButton
     };
   },
   data() {
@@ -128,6 +153,12 @@ export default defineComponent({
   overflow: hidden;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+}
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding-bottom: 2rem;
 }
 
 .anime-card:hover {
@@ -160,6 +191,10 @@ export default defineComponent({
   padding: 16px;
   flex-grow: 1;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; 
+  height: 100%; 
 }
 
 .anime-title {
@@ -180,12 +215,9 @@ export default defineComponent({
   -webkit-box-orient: vertical;
 }
 
-.watchlist-btn {
-  position: absolute;
-  bottom: 16px;
-  right: 16px;
+.seen-btn, .watchlist-btn {
   padding: 10px 20px;
-  font-size: 0.9rem;
+  font-size: 0.7rem;
   color: #22303b;
   background-color: #f5af0d;
   border: none;
@@ -193,6 +225,10 @@ export default defineComponent({
   cursor: pointer;
   transition: background-color 0.2s;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.seen-btn:hover {
+  background-color: #c48807;
 }
 .watchlist-btn:hover {
   background-color: #c48807;
