@@ -40,6 +40,8 @@
 import { defineComponent, ref, computed, watch } from 'vue';
 import { useWatchlistStore } from '@/stores/store.js';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toastification';
+
 
 export default defineComponent({
   name: 'Card',
@@ -58,6 +60,7 @@ export default defineComponent({
     const rating = ref(0);
     const isSeen = ref(false);
     const animeId = props.anime.mal_id;
+    const toast = useToast();
 
     const isInWatchlist = ref(false);
     if (localStorage.getItem(`isInWatchlist_${animeId}`)) {
@@ -81,6 +84,7 @@ export default defineComponent({
 
     function toggleSeen() {
       isSeen.value = !isSeen.value;
+      toast.success(isSeen.value ? "Marked as Seen" : "Marked as Unseen");
     }
 
     const seenButton = computed(() => {
@@ -90,8 +94,10 @@ export default defineComponent({
     function toggleWatchlist() {
       if (isInWatchlist.value) {
         watchlistStore.removeFromWatchlist(props.anime.mal_id);
+        toast.error("Removed from Watchlist");
       } else {
         watchlistStore.addToWatchlist(props.anime.mal_id);
+        toast.success("Added to Watchlist");
       }
       isInWatchlist.value = !isInWatchlist.value;
     }
